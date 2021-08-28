@@ -13,9 +13,64 @@
          "width":50,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":3,
+         "name":"objects",
+         "objects":[
+                {
+                 "height":28.8271885905021,
+                 "id":5,
+                 "name":"start",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":30.3444090426339,
+                 "x":384.615384615385,
+                 "y":514.337733272645
+                }, 
+                {
+                 "height":31.6222198798356,
+                 "id":7,
+                 "name":"potion",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":29.5140718878465,
+                 "x":1216.40139137767,
+                 "y":384.737008537999
+                }, 
+                {
+                 "height":28.459997891852,
+                 "id":8,
+                 "name":"potion",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":30.568145883841,
+                 "x":578.686623800991,
+                 "y":514.388110045325
+                }, 
+                {
+                 "height":29.5140718878465,
+                 "id":9,
+                 "name":"potion",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":30.568145883841,
+                 "x":864.340676715506,
+                 "y":387.899230525983
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":2,
- "nextobjectid":1,
+ "nextlayerid":4,
+ "nextobjectid":11,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.7.2",

@@ -1,13 +1,12 @@
-// import Phaser from "phaser";
-
 const gameDiv = document.querySelector(".game");
 
 const config = {
   type: Phaser.AUTO,
+  // makes game responsive
   scale: {
     parent: gameDiv,
     mode: Phaser.Scale.FIT,
-    width: 800,
+    width: 600,
     height: 600,
   },
   physics: {
@@ -24,15 +23,26 @@ const config = {
 };
 
 const game = new Phaser.Game(config);
-let player;
-let cursors;
 
+const gameState = {
+  player: null,
+  cursors: null,
+  jumps: 0,
+  score: 0
+}
+
+// load game assets
 function preload() {
   this.load.image("tiles", "assets/tiles.png");
   this.load.tilemapTiledJSON("tilemap", "assets/graveyard.json");
+
   this.load.spritesheet("witch", "assets/witch.png", {
     frameWidth: 25,
     frameHeight: 45,
+  }, 0);
+  this.load.spritesheet("potion", "assets/potion-orange.png", {
+    frameWidth: 16,
+    frameHeight: 16,
   }, 0);
 }
 
@@ -41,17 +51,8 @@ function create() {
   const tileset = map.addTilesetImage("gravesheet", "tiles");
   const ground = map.createLayer("ground", tileset);
   ground.setCollisionByProperty({ collides: true });
-  this.matter.world.convertTilemapLayer(ground);
 
-  // this.cameras.main.scrollY = -100
-  const { width, height } = this.scale;
-
-  player = this.matter.add
-    .sprite(width * 0.25, height * 0.5, "witch")
-    .setScale(2)
-    .setFixedRotation();
-
-  //  Our player animations, turning, walking left and walking right.
+  // player animations for walking and idle
   this.anims.create({
     key: "run",
     frames: this.anims.generateFrameNumbers("witch", { start: 0, end: 3 }),
@@ -65,33 +66,93 @@ function create() {
     frameRate: 20,
   });
 
-  cursors = this.input.keyboard.createCursorKeys();
-  this.cameras.main.startFollow(player);
+  const objectLayer = map.getObjectLayer('objects')
+
+  // add objects to game
+  objectLayer.objects.forEach(data => {
+    const { x = 0, y = 0, name } = data
+
+    switch (name) {
+      case 'start' : {
+          gameState.player = this.matter.add
+            .sprite(x, y, "witch")
+            .setScale(2)
+            .setFixedRotation();
+
+          gameState.player.setOnCollide(data => {
+            const gameObj = data.bodyB.gameObject
+            
+            if (gameObj instanceof Phaser.Physics.Matter.TileBody) {
+              gameState.jumps = 0;
+            } else {
+              const type = gameObj.getData('type')
+            
+              switch (type) {
+                case 'potion': {
+                  collectPotion(gameObj)
+                  break
+                }
+              }
+            }
+            
+          })
+
+          this.cameras.main.startFollow(gameState.player);
+
+          break
+        }
+
+      case 'potion': {
+          const potion = this.matter.add.sprite(x, y, 'potion', 0, {isStatic: true, isSensor: true}).setScale(1.5)
+
+          potion.setData('type', 'potion');
+          
+          break
+        }
+    }
+  });
+
+  gameState.cursors = this.input.keyboard.createCursorKeys();
+
+  this.matter.world.convertTilemapLayer(ground);
 }
 
 function update() {
   const speed = 10;
-  if (cursors.left.isDown) {
-    player.setVelocityX(-speed);
-    player.flipX = true;
-    player.play("run", true);
+  if (gameState.cursors.left.isDown) {
+    gameState.player.setVelocityX(-speed);
+    gameState.player.flipX = true;
+    gameState.player.play("run", true);
   } 
-  else if (cursors.right.isDown) 
+  else if (gameState.cursors.right.isDown) 
   {
-    player.setVelocityX(speed);
-    player.flipX = false;
-    player.play("run", true);
+    gameState.player.setVelocityX(speed);
+    gameState.player.flipX = false;
+    gameState.player.play("run", true);
   } 
   else 
   {
-    player.setVelocityX(0);
-    player.anims.play("idle");
+    gameState.player.setVelocityX(0);
+    gameState.player.anims.play("idle");
   }
 
-  const upJustPressed = Phaser.Input.Keyboard.JustDown(cursors.up)
+  const upJustPressed = Phaser.Input.Keyboard.JustDown(gameState.cursors.up)
   
   if (upJustPressed) {
-    player.setVelocityY(-10);
-    player.anims.play("idle");
+    if (gameState.jumps < 2) {
+      gameState.player.setVelocityY(-10);
+      gameState.player.anims.play("idle");
+      gameState.jumps++
+    }
   }
+}
+
+function collectPotion (potion)
+{
+    potion.destroy(true, true);
+
+    //  Add and update the score
+    gameState.score += 10;
+    console.log(gameState.score)
+
 }
