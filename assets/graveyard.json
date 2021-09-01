@@ -326,8 +326,8 @@
                  "type":"",
                  "visible":true,
                  "width":33.7747755755045,
-                 "x":6272.33134832459,
-                 "y":444.404941782953
+                 "x":5609.79264863419,
+                 "y":500.13249596252
                 }, 
                 {
                  "height":29.3307261576749,
@@ -493,6 +493,17 @@
                  "width":30.7729,
                  "x":2101.73640168682,
                  "y":276.946904742202
+                }, 
+                {
+                 "height":92.8792569659443,
+                 "id":64,
+                 "name":"statue",
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":54.1795665634681,
+                 "x":6342.10190066886,
+                 "y":380.858168604264
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -501,7 +512,7 @@
          "y":0
         }],
  "nextlayerid":9,
- "nextobjectid":58,
+ "nextobjectid":66,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.7.2",
