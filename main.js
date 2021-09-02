@@ -224,7 +224,7 @@ const Game = new Phaser.Class({
       .setScrollFactor(0)
       .setScale(0.7)
       .setInteractive()
-      .on("pointerdown", () => (this.jump()))
+      .on("pointerdown", () => this.jump());
 
     this.jumpBtn.angle = -90;
 
@@ -245,13 +245,15 @@ const Game = new Phaser.Class({
         this.player.anims.play("idle");
       }
 
-      const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) || Phaser.Input.Keyboard.JustDown(this.cursors.space);
+      const upJustPressed =
+        Phaser.Input.Keyboard.JustDown(this.cursors.up) ||
+        Phaser.Input.Keyboard.JustDown(this.cursors.space);
 
       if (upJustPressed) {
-        this.jump()
+        this.jump();
       }
     }
-     
+
     if (this.ghostTime > 3000) {
       this.ghostSpeed = -this.ghostSpeed;
       this.ghostTime = 0;
@@ -336,20 +338,21 @@ const Game = new Phaser.Class({
   },
 
   finish() {
-    this.addText("Level Completed!");
+    this.addText("You Win!", 0, -50);
+    this.addText(`Score: ${this.score}`, 0, 50, "48px");
     this.player.setOnCollide(() => {});
-    this.changeScene(2000);
+    this.changeScene(3000);
   },
 
-  addText(text) {
+  addText(text, xOffset = 0, yOffset = 0, fontSize = "72px") {
     const screenCenterX =
       this.cameras.main.worldView.x + this.cameras.main.width / 2;
     const screenCenterY =
       this.cameras.main.worldView.y + this.cameras.main.height / 2;
 
     this.add
-      .text(screenCenterX, screenCenterY, text, {
-        fontSize: "72px",
+      .text(screenCenterX + xOffset, screenCenterY + yOffset, text, {
+        fontSize: fontSize,
         fill: "#fff",
       })
       .setOrigin(0.5);
