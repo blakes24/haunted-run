@@ -1,4 +1,5 @@
 const gameDiv = document.querySelector(".game");
+const linkPrefix = "/haunted-run";
 
 const Game = new Phaser.Class({
   Extends: Phaser.Scene,
@@ -311,7 +312,6 @@ const Options = new Phaser.Class({
 
   preload() {
     this.load.image("background", "assets/Background_0.png");
-    this.load.image("background2", "assets/Background_1.png");
   },
 
   create() {
@@ -357,7 +357,7 @@ const Options = new Phaser.Class({
   },
 
   quit() {
-    window.location.assign("/")
+    window.location.assign(linkPrefix + "/");
   }
 });
 
