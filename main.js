@@ -138,7 +138,6 @@ const Game = new Phaser.Class({
                 }
                 case "statue": {
                   // statue detects when player reacher finish
-                  console.log("winner");
                   this.finish();
                   break;
                 }
@@ -201,7 +200,7 @@ const Game = new Phaser.Class({
   update() {
     // if player is alive allow controls
     if (this.health > 0) {
-      const speed = 5;
+      const speed = 3;
       if (this.cursors.left.isDown) {
         this.player.setVelocityX(-speed);
         this.player.flipX = true;
@@ -312,6 +311,7 @@ const Options = new Phaser.Class({
 
   preload() {
     this.load.image("background", "assets/Background_0.png");
+    this.load.image("background2", "assets/Background_1.png");
   },
 
   create() {
@@ -319,11 +319,46 @@ const Options = new Phaser.Class({
     const bg = this.add.image(400, 250, "background");
     bg.setDisplaySize(800, 500);
 
-    this.add.text(150, 200, "Options", {
-      fontSize: "72px",
+    this.add.text(this.cameras.main.centerX, 200, "Haunted Run", {
+        fontSize: "5rem",
+        fill: "#fff",
+      })
+      .setOrigin(0.5);
+
+    const startButton = this.add.text(this.cameras.main.centerX - 100, 300, 'Play', {
+      fontSize: "48px",
       fill: "#fff",
-    });
+    })
+    .setOrigin(0.5)
+    .setPadding(10)
+    .setStyle({ backgroundColor: '#111' })
+    .setInteractive({ useHandCursor: true })
+    .on('pointerdown', this.start)
+    .on('pointerover', () => startButton.setStyle({ fill: '#f39c12' }))
+    .on('pointerout', () => startButton.setStyle({ fill: '#FFF' }));
+
+    const quitButton = this.add.text(this.cameras.main.centerX + 100, 300, 'Quit', {
+      fontSize: "48px",
+      fill: "#fff",
+    })
+    .setOrigin(0.5)
+    .setPadding(10)
+    .setStyle({ backgroundColor: '#111' })
+    .setInteractive({ useHandCursor: true })
+    .on('pointerdown', this.quit)
+    .on('pointerover', () => quitButton.setStyle({ fill: '#f39c12' }))
+    .on('pointerout', () => quitButton.setStyle({ fill: '#FFF' }));
+
+    
   },
+
+  start() {
+    this.scene.start('game')
+  },
+
+  quit() {
+    window.location.assign("/")
+  }
 });
 
 const config = {
@@ -339,10 +374,10 @@ const config = {
   physics: {
     default: "matter",
     matter: {
-      // debug: true,
+      debug: false,
     },
   },
-  scene: [Game, Options],
+  scene: [Options, Game],
 };
 
 const game = new Phaser.Game(config);
