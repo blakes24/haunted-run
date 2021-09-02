@@ -10,6 +10,9 @@ const Game = new Phaser.Class({
 
   init() {
     this.jumps = 0;
+    this.speed = 3;
+    this.movingRight = false;
+    this.movingLeft = false;
     this.score = 0;
     this.health = 100;
   },
@@ -23,6 +26,8 @@ const Game = new Phaser.Class({
     this.load.tilemapTiledJSON("tilemap", "assets/graveyard.json");
 
     this.load.image("statue", "assets/salt.png");
+    this.load.image("left", "assets/leftArrow.png");
+    this.load.image("right", "assets/rightArrow.png");
 
     this.load.spritesheet(
       "witch",
@@ -193,6 +198,31 @@ const Game = new Phaser.Class({
       }
     });
 
+    this.leftBtn = this.add
+      .image(50, 450, "left")
+      .setScrollFactor(0)
+      .setScale(0.7)
+      .setInteractive()
+      .on("pointerdown", () => (this.movingLeft = true))
+      .on("pointerup", () => (this.movingLeft = false));
+
+    this.rightBtn = this.add
+      .image(175, 450, "right")
+      .setScrollFactor(0)
+      .setScale(0.7)
+      .setInteractive()
+      .on("pointerdown", () => (this.movingRight = true))
+      .on("pointerup", () => (this.movingRight = false));
+
+    this.jumpBtn = this.add
+      .image(700, 450, "right")
+      .setScrollFactor(0)
+      .setScale(0.7)
+      .setInteractive()
+      .on("pointerdown", () => (this.jump()))
+
+    this.jumpBtn.angle = -90;
+
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.matter.world.convertTilemapLayer(ground);
@@ -201,30 +231,41 @@ const Game = new Phaser.Class({
   update() {
     // if player is alive allow controls
     if (this.health > 0) {
-      const speed = 3;
-      if (this.cursors.left.isDown) {
-        this.player.setVelocityX(-speed);
-        this.player.flipX = true;
-        this.player.play("run", true);
-      } else if (this.cursors.right.isDown) {
-        this.player.setVelocityX(speed);
-        this.player.flipX = false;
-        this.player.play("run", true);
+      if (this.cursors.left.isDown || this.movingLeft === true) {
+        this.moveLeft();
+      } else if (this.cursors.right.isDown || this.movingRight === true) {
+        this.moveRight();
       } else {
         this.player.setVelocityX(0);
         this.player.anims.play("idle");
       }
 
-      const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up);
+      const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.up) || Phaser.Input.Keyboard.JustDown(this.cursors.space);
 
       if (upJustPressed) {
-        if (this.jumps < 1) {
-          this.player.setVelocityY(-10);
-          this.player.anims.play("idle");
-          this.jumps++;
-        }
+        this.jump()
       }
     }
+  },
+
+  jump() {
+    if (this.jumps < 1) {
+      this.player.setVelocityY(-10);
+      this.player.anims.play("idle");
+      this.jumps++;
+    }
+  },
+
+  moveRight() {
+    this.player.setVelocityX(this.speed);
+    this.player.flipX = false;
+    this.player.play("run", true);
+  },
+
+  moveLeft() {
+    this.player.setVelocityX(-this.speed);
+    this.player.flipX = true;
+    this.player.play("run", true);
   },
 
   collectPotion(potion) {
@@ -319,8 +360,9 @@ const Options = new Phaser.Class({
     const bg = this.add.image(400, 250, "background");
     bg.setDisplaySize(800, 500);
 
-    this.add.text(this.cameras.main.centerX, 200, "Haunted Run", {
-        fontSize: "5rem",
+    this.add
+      .text(this.cameras.main.centerX, 200, "Haunted Run", {
+        fontSize: "72px",
         fill: "#fff",
       })
       .setOrigin(0.5);
@@ -374,10 +416,13 @@ const config = {
   physics: {
     default: "matter",
     matter: {
-      debug: false,
+      // debug: true,
     },
   },
   scene: [Options, Game],
+  input :{
+		activePointers:3,
+	},
 };
 
 const game = new Phaser.Game(config);
