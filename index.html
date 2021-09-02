@@ -30,7 +30,7 @@
     h2 {
       margin-bottom: 1rem;
     }
-    a {
+    .play {
       display: inline-block;
       margin: 1.5rem;
       padding: 0.5rem 1.5rem;
@@ -40,7 +40,7 @@
       border-radius: 8px;
       text-decoration: none;
     }
-    a:hover {
+    .play:hover {
       background-color: #f39c12;
     }
     p {
@@ -65,8 +65,18 @@
       width: 100vw;
     }
 
+    footer > a {
+      text-decoration: none;
+    }
+
+    footer > p {
+      margin: 0;
+      padding-bottom: 0.5rem;
+      font-size: 0.8rem;
+    }
+
     .icons {
-      margin-top: 0.3rem;
+      margin: 0.5rem;
     }
 
     .icons a {
@@ -74,10 +84,12 @@
       font-size: 2rem;
       margin: 1rem;
       padding: 0;
+      text-decoration: none;
     }
     .icons a:hover {
       color:  #f39c12;
       background-color: turquoise;
+      
     }
 
 </style>
@@ -125,6 +137,7 @@
       <i class="fas fa-envelope" aria-hidden="true"></i>
       </a>
     </div>
+    <p>Game music by <a href="https://soundcloud.com/zebestian">Sebastian Schwamm</a></p>
   </footer>
   
 </body>

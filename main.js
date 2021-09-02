@@ -32,6 +32,11 @@ const Game = new Phaser.Class({
     this.load.image("left", "assets/leftArrow.png");
     this.load.image("right", "assets/rightArrow.png");
 
+    this.load.audio("pickup", ["assets/Pickup_006.ogg"]);
+    this.load.audio("damage", ["assets/hurt.ogg"]);
+    this.load.audio("end", ["assets/end-long.ogg"]);
+    this.load.audio("win", ["assets/win2.wav"]);
+
     this.load.spritesheet(
       "witch",
       "assets/witch.png",
@@ -81,6 +86,11 @@ const Game = new Phaser.Class({
 
     this.cameras.main.setBounds(0, 0, 6400, 640);
     this.matter.world.setBounds(0, 0, 6400, 640);
+
+    this.pickup = this.sound.add("pickup", { loop: false, volume: 0.5 });
+    this.damage = this.sound.add("damage", { loop: false });
+    this.end = this.sound.add("end", { loop: false });
+    this.win = this.sound.add("win", { loop: false, volume: 2 });
 
     // health bar
     this.graphics = this.add.graphics().setScrollFactor(0);
@@ -290,13 +300,14 @@ const Game = new Phaser.Class({
 
   collectPotion(potion) {
     potion.destroy(true, true);
-
+    this.pickup.play();
     //  Add and update the score
     this.score += 10;
     this.scoreText.setText(`score: ${this.score}`);
   },
 
   takeDamage() {
+    this.damage.play();
     this.player.setTint(0xb700e0);
     setTimeout(() => {
       this.player.clearTint();
@@ -329,6 +340,7 @@ const Game = new Phaser.Class({
     this.player.setVelocityY(-8);
     this.player.setOnCollide(() => {});
     this.player.anims.play("idle");
+    this.end.play();
 
     setTimeout(() => {
       this.addText("Game Over");
@@ -341,6 +353,7 @@ const Game = new Phaser.Class({
     this.addText("You Win!", 0, -50);
     this.addText(`Score: ${this.score}`, 0, 50, "48px");
     this.player.setOnCollide(() => {});
+    this.win.play();
     this.changeScene(3000);
   },
 
@@ -376,16 +389,20 @@ const Options = new Phaser.Class({
 
   initialize: function Options() {
     Phaser.Scene.call(this, "options");
+    this.musicStarted = false;
   },
 
   preload() {
     this.load.image("background", "assets/Background_0.png");
+    this.load.audio("music", ["assets/Nightmare-Castle.ogg"]);
   },
 
   create() {
     this.cameras.main.fadeIn(1000, 0, 0, 0);
     const bg = this.add.image(400, 250, "background");
     bg.setDisplaySize(800, 500);
+
+    this.music = this.sound.add("music", { loop: true });
 
     this.add
       .text(this.cameras.main.centerX, 200, "Haunted Run", {
@@ -418,7 +435,18 @@ const Options = new Phaser.Class({
     .on('pointerover', () => quitButton.setStyle({ fill: '#f39c12' }))
     .on('pointerout', () => quitButton.setStyle({ fill: '#FFF' }));
 
-    
+    this.soundButton = this.add
+      .text(this.cameras.main.centerX, 400, "Sound On", {
+        fontSize: "32px",
+        fill: "#fff",
+      })
+      .setOrigin(0.5)
+      .setPadding(10)
+      .setStyle({ backgroundColor: "#111" })
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", () => this.toggleSound())
+      .on("pointerover", () => this.soundButton.setStyle({ fill: "#f39c12" }))
+      .on("pointerout", () => this.soundButton.setStyle({ fill: "#FFF" }));
   },
 
   start() {
@@ -427,6 +455,20 @@ const Options = new Phaser.Class({
 
   quit() {
     window.location.assign(linkPrefix + "/");
+  },
+
+  toggleSound() {
+    if (!this.musicStarted) {
+      this.music.play()
+      this.musicStarted = true
+    } else {
+      if(game.sound.mute === true) {
+        this.soundButton.setText("Sound Off")
+      } else {
+        this.soundButton.setText("Sound On")
+      }
+      game.sound.mute = !game.sound.mute
+    }
   }
 });
 
