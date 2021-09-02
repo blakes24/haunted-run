@@ -8,6 +8,11 @@
   <script src="https://kit.fontawesome.com/2580409782.js" crossorigin="anonymous"></script>
   <style type="text/css">
     body {
+      background-color: #0D1327;
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+      margin: 0;
+    }
+    main {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -15,6 +20,7 @@
       color: whitesmoke;
       font-family: Verdana, Geneva, Tahoma, sans-serif;
       margin: 0;
+      min-height: calc(100vh - 110px);
     }
     h1 {
       font-size: 3rem;
@@ -77,18 +83,20 @@
 </style>
 </head>
 <body>
-  <h1>Haunted Run</h1>
-  <img src="/assets/screenshot.png" alt="screenshot of game"/>
-  
-  <div class="container">
-    <h2>How to play</h2>
-    <p>Collect as many potions as you can in the haunted graveyard, but watch out for the ghosts!</p>
-    <p>Use the right and left arrows to move, and the up arrow or space bar to jump.</p>
-    <a href="/haunted-run/game" class="play">Play</a>
-    <h2>About</h2>
-    <p>This game was created for Mintbean's August hiring hackathon. The challenge was to create a 2D game using JavaScript. This project was built with JavaScript, Phaser 3, HTML, and CSS.</p>
-    </p>
-  </div>
+  <main>
+    <h1>Haunted Run</h1>
+    <img src="/haunted-run/assets/screenshot.png" alt="screenshot of game"/>
+    
+    <div class="container">
+      <h2>How to play</h2>
+      <p>Collect as many potions as you can in the haunted graveyard, but watch out for the ghosts!</p>
+      <p>Use the right and left arrows to move, and the up arrow or space bar to jump.</p>
+      <a href="/haunted-run/game" class="play">Play</a>
+      <h2>About</h2>
+      <p>This game was created for Mintbean's August hiring hackathon. The challenge was to create a 2D game using JavaScript. This project was built with JavaScript, Phaser 3, HTML, and CSS.</p>
+      </p>
+    </div>
+  </main>
   <footer>
     Blakely Burns
     <div class="icons">
