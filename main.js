@@ -10,11 +10,14 @@ const Game = new Phaser.Class({
 
   init() {
     this.jumps = 0;
-    this.speed = 3;
+    this.speed = 3.2;
     this.movingRight = false;
     this.movingLeft = false;
     this.score = 0;
     this.health = 100;
+    this.ghosts = [];
+    this.ghostTime = 0;
+    this.ghostSpeed = -1;
   },
 
   // load game assets
@@ -25,7 +28,7 @@ const Game = new Phaser.Class({
     this.load.image("mid-tiles", "assets/mid-bg.png");
     this.load.tilemapTiledJSON("tilemap", "assets/graveyard.json");
 
-    this.load.image("statue", "assets/salt.png");
+    this.load.image("statue", "assets/statue.png");
     this.load.image("left", "assets/leftArrow.png");
     this.load.image("right", "assets/rightArrow.png");
 
@@ -172,13 +175,15 @@ const Game = new Phaser.Class({
         case "ghost": {
           const ghost = this.matter.add
             .sprite(x, y, "ghost", 0, {
-              isStatic: true,
               isSensor: true,
             })
             .setFixedRotation();
 
           ghost.setData("type", "ghost");
           ghost.play("ghost");
+          ghost.body.ignoreGravity = true;
+
+          this.ghosts.push(ghost);
 
           break;
         }
@@ -246,6 +251,19 @@ const Game = new Phaser.Class({
         this.jump()
       }
     }
+     
+    if (this.ghostTime > 3000) {
+      this.ghostSpeed = -this.ghostSpeed;
+      this.ghostTime = 0;
+      for (let ghost of this.ghosts) {
+        ghost.flipX = !ghost.flipX;
+      }
+    }
+
+    for (let ghost of this.ghosts) {
+      ghost.setVelocityX(this.ghostSpeed);
+      this.ghostTime++;
+    }
   },
 
   jump() {
@@ -280,7 +298,13 @@ const Game = new Phaser.Class({
     this.player.setTint(0xb700e0);
     setTimeout(() => {
       this.player.clearTint();
-    }, 250);
+    }, 100);
+    setTimeout(() => {
+      this.player.setTint(0xb700e0);
+    }, 200);
+    setTimeout(() => {
+      this.player.clearTint();
+    }, 300);
     this.health -= 20;
     this.setHealth(this.health);
   },
