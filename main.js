@@ -35,7 +35,8 @@ const Game = new Phaser.Class({
     this.load.audio("pickup", ["assets/Pickup_006.ogg"]);
     this.load.audio("damage", ["assets/hurt.ogg"]);
     this.load.audio("end", ["assets/end-long.ogg"]);
-    this.load.audio("win", ["assets/win2.wav"]);
+    this.load.audio("win", ["assets/win2.ogg"]);
+    this.load.audio("music", ["assets/Nightmare-Castle.ogg"]);
 
     this.load.spritesheet(
       "witch",
@@ -86,11 +87,6 @@ const Game = new Phaser.Class({
 
     this.cameras.main.setBounds(0, 0, 6400, 640);
     this.matter.world.setBounds(0, 0, 6400, 640);
-
-    this.pickup = this.sound.add("pickup", { loop: false, volume: 0.5 });
-    this.damage = this.sound.add("damage", { loop: false });
-    this.end = this.sound.add("end", { loop: false });
-    this.win = this.sound.add("win", { loop: false, volume: 2 });
 
     // health bar
     this.graphics = this.add.graphics().setScrollFactor(0);
@@ -213,6 +209,17 @@ const Game = new Phaser.Class({
       }
     });
 
+    this.soundButton = this.add
+      .text(670, 20, "Sound Off", {
+        fontSize: "20px",
+        fill: "#fff",
+      })
+      .setScrollFactor(0)
+      .setInteractive({ useHandCursor: true })
+      .on("pointerdown", () => this.toggleSound())
+      .on("pointerover", () => this.soundButton.setStyle({ fill: "#f39c12" }))
+      .on("pointerout", () => this.soundButton.setStyle({ fill: "#FFF" }));
+
     this.leftBtn = this.add
       .image(50, 450, "left")
       .setScrollFactor(0)
@@ -241,6 +248,13 @@ const Game = new Phaser.Class({
     this.cursors = this.input.keyboard.createCursorKeys();
 
     this.matter.world.convertTilemapLayer(ground);
+
+    this.pickup = this.sound.add("pickup", { loop: false, volume: 0.5 });
+    this.damage = this.sound.add("damage", { loop: false });
+    this.end = this.sound.add("end", { loop: false });
+    this.win = this.sound.add("win", { loop: false, volume: 2 });
+    this.music = this.sound.add("music", { loop: true });
+    this.music.play();
   },
 
   update() {
@@ -371,12 +385,22 @@ const Game = new Phaser.Class({
       .setOrigin(0.5);
   },
 
+  toggleSound() {
+    if(game.sound.mute === true) {
+      this.soundButton.setText("Sound Off")
+    } else {
+      this.soundButton.setText("Sound On")
+    }
+    game.sound.mute = !game.sound.mute
+  },
+
   changeScene(delay) {
     setTimeout(() => {
       this.cameras.main.fadeOut(1000, 0, 0, 0);
       this.cameras.main.once(
         Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
         () => {
+          this.music.stop()
           this.scene.start("options");
         }
       );
@@ -394,15 +418,12 @@ const Options = new Phaser.Class({
 
   preload() {
     this.load.image("background", "assets/Background_0.png");
-    this.load.audio("music", ["assets/Nightmare-Castle.ogg"]);
   },
 
   create() {
     this.cameras.main.fadeIn(1000, 0, 0, 0);
     const bg = this.add.image(400, 250, "background");
     bg.setDisplaySize(800, 500);
-
-    this.music = this.sound.add("music", { loop: true });
 
     this.add
       .text(this.cameras.main.centerX, 200, "Haunted Run", {
@@ -434,19 +455,6 @@ const Options = new Phaser.Class({
     .on('pointerdown', this.quit)
     .on('pointerover', () => quitButton.setStyle({ fill: '#f39c12' }))
     .on('pointerout', () => quitButton.setStyle({ fill: '#FFF' }));
-
-    this.soundButton = this.add
-      .text(this.cameras.main.centerX, 400, "Sound On", {
-        fontSize: "32px",
-        fill: "#fff",
-      })
-      .setOrigin(0.5)
-      .setPadding(10)
-      .setStyle({ backgroundColor: "#111" })
-      .setInteractive({ useHandCursor: true })
-      .on("pointerdown", () => this.toggleSound())
-      .on("pointerover", () => this.soundButton.setStyle({ fill: "#f39c12" }))
-      .on("pointerout", () => this.soundButton.setStyle({ fill: "#FFF" }));
   },
 
   start() {
@@ -456,20 +464,6 @@ const Options = new Phaser.Class({
   quit() {
     window.location.assign(linkPrefix + "/");
   },
-
-  toggleSound() {
-    if (!this.musicStarted) {
-      this.music.play()
-      this.musicStarted = true
-    } else {
-      if(game.sound.mute === true) {
-        this.soundButton.setText("Sound Off")
-      } else {
-        this.soundButton.setText("Sound On")
-      }
-      game.sound.mute = !game.sound.mute
-    }
-  }
 });
 
 const config = {
@@ -492,6 +486,21 @@ const config = {
   input :{
 		activePointers:3,
 	},
+  audio: {},
+  callbacks: {
+    // prevent game from crashing on mobile devices that don't support ogg audio files
+    preBoot: function(game) {
+      var ogg = game.device.audio.ogg;
+
+      if (!ogg) {
+        game.events.off('prestep', game.sound.update, game.sound);
+        game.events.off('destroy', game.sound.destroy, game.sound);
+        game.sound.destroy();
+        game.config.audio.noAudio = true;
+        game.sound = Phaser.Sound.SoundManagerCreator.create(game);
+      }
+    }
+  }
 };
 
 const game = new Phaser.Game(config);
